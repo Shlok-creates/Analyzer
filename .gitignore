@@ -1,0 +1,34 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Editor & OS settings
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Node.js
+node_modules/
+
+# Preserve demo PDFs and vector database files
+!uploads/
+!uploads/**
+!analyser-backend/uploads/
+!analyser-backend/uploads/**
+!analyser-backend/chroma_db/
+!analyser-backend/chroma_db/**
+!analyser-backend/data/
+!analyser-backend/data/**
+

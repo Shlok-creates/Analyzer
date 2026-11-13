@@ -1,0 +1,3477 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pacifico&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================
+   ANALYZER — Campus Intelligence Platform
+   Editorial academic theme: warm paper, ink, deep teal, lime
+   ========================================================== */
+    :root {
+      --bg: #F6F4EE;
+      --bg-alt: #EFECE3;
+      --s1: #FFFFFF;
+      --s2: #F3F1EA;
+      --s3: #E7E3D6;
+
+      --tx: #16202E;
+      --tx-sec: #3B4657;
+      --mu: #6B7482;
+      --ln: #E4E0D3;
+      --ln-strong: #CFCABA;
+
+      --ac: #0B6B5D;
+      --ac-hover: #095449;
+      --ac-light: #E5F2EF;
+      --ac-subtle: #BFDDD6;
+      --lime: #B5D334;
+      --lime-soft: #F0F6CF;
+      --ink: #16202E;
+
+      --success: #0F7A4F;
+      --success-bg: #E6F5ED;
+      --success-border: #B5E0C8;
+      --warning: #B45309;
+      --warning-bg: #FEF3DC;
+      --warning-border: #F5D99A;
+      --danger: #B42318;
+      --danger-bg: #FDECEA;
+      --danger-border: #F6C2BC;
+
+      --radius: 18px;
+      --shadow-sm: 0 1px 2px rgba(22, 32, 46, .05), 0 2px 8px rgba(22, 32, 46, .04);
+      --shadow-md: 0 8px 28px -6px rgba(22, 32, 46, .12);
+      --ease: cubic-bezier(.2, .8, .2, 1);
+      --display: 'Fraunces', Georgia, serif;
+
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: inherit;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--tx);
+      font: 400 15px/1.6 'Inter', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: var(--display);
+      font-weight: 600;
+      color: var(--tx);
+      margin: 0;
+      letter-spacing: -0.015em;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--ac);
+      outline-offset: 2px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--ln-strong);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #A9A391;
+    }
+
+    /* ---------- Layout ---------- */
+    .app {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) 330px;
+      height: 100%;
+      background: var(--bg);
+    }
+
+    /* ---------- Navigation rail ---------- */
+    .rail {
+      align-self: center;
+      justify-self: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px;
+      background: var(--s1);
+      border: 1px solid var(--ln);
+      border-radius: 30px;
+      box-shadow: var(--shadow-md);
+      z-index: 10;
+    }
+
+    .rail button {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      border: 0;
+      background: none;
+      color: var(--mu);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all .2s var(--ease);
+    }
+
+    .rail svg {
+      width: 20px;
+      height: 20px;
+      transition: transform .2s;
+    }
+
+    .rail button:hover {
+      color: var(--tx);
+      background: var(--s2);
+    }
+
+    .rail button:hover svg {
+      transform: scale(1.1);
+    }
+
+    .rail button[aria-current] {
+      color: #fff;
+      background: var(--ac);
+      box-shadow: 0 6px 16px rgba(11, 107, 93, .28);
+    }
+
+    .rail button[aria-current] svg {
+      stroke: #fff;
+      stroke-width: 2.2;
+    }
+
+    .rail button::after {
+      content: attr(data-l);
+      position: absolute;
+      left: 64px;
+      white-space: nowrap;
+      background: var(--ink);
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #fff;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-6px);
+      transition: opacity .2s, transform .2s;
+      box-shadow: var(--shadow-md);
+      z-index: 20;
+    }
+
+    .rail button:hover::after,
+    .rail button:focus-visible::after {
+      opacity: 1;
+      transform: none;
+    }
+
+    .rail-badge {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      min-width: 17px;
+      height: 17px;
+      padding: 0 4px;
+      border-radius: 99px;
+      background: #F04438;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--ink);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      50% {
+        transform: scale(1.12);
+      }
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 0 16px;
+      z-index: 10;
+      border-bottom: 1px solid var(--ln);
+      margin-bottom: 28px;
+      background: rgba(246, 244, 238, .92);
+      backdrop-filter: blur(10px);
+      min-width: 0;
+    }
+
+    .topbar-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .brand-mascot {
+      width: 44px;
+      height: 44px;
+      transition: transform .25s var(--ease);
+    }
+
+    .topbar-brand:hover .brand-mascot {
+      transform: scale(1.08) rotate(-3deg);
+    }
+
+    .brand-lockup {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .brand-wordmark {
+      font-family: 'Pacifico', cursive;
+      font-size: 26px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .brand-swash {
+      width: 104px;
+      height: 10px;
+      margin-top: -2px;
+      margin-left: 2px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .role-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 99px;
+      background: var(--ink);
+      color: #fff;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+
+    .role-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 0 3px rgba(181, 211, 52, .3);
+    }
+
+    .btn-auth {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      background: var(--s1);
+      border: 1px solid var(--ln-strong);
+      color: var(--tx);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s var(--ease);
+      white-space: nowrap;
+    }
+
+    .btn-auth svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-auth:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    .btn-auth.primary {
+      background: var(--ac);
+      color: #fff;
+      border-color: var(--ac);
+      box-shadow: 0 4px 14px rgba(11, 107, 93, .28);
+    }
+
+    .btn-auth.primary:hover {
+      background: var(--ac-hover);
+      border-color: var(--ac-hover);
+    }
+
+    /* ---------- Main ---------- */
+    main {
+      overflow: auto;
+      padding: 24px 36px 56px;
+      min-width: 0;
+      position: relative;
+    }
+
+    body[data-v=chat] main {
+      overflow: hidden;
+      padding: 24px 36px 20px;
+    }
+
+    aside {
+      overflow: auto;
+      padding: 24px 24px 48px;
+      border-left: 1px solid var(--ln);
+      background: var(--bg-alt);
+    }
+
+    .v {
+      display: none;
+    }
+
+    .v.on {
+      display: block;
+      animation: in .35s var(--ease);
+    }
+
+    body[data-v=chat] .v.on {
+      height: calc(100vh - 115px);
+    }
+
+    @keyframes in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      max-width: 860px;
+      padding: 8px 0 6px;
+    }
+
+    .hero h1 {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      font-size: clamp(34px, 4.6vw, 52px);
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--tx);
+    }
+
+    .hero h1 span {
+      display: block;
+      color: var(--ac);
+      font-style: normal;
+      font-weight: 800;
+    }
+
+    .hero p {
+      color: var(--mu);
+      margin: 12px 0 0;
+      font-size: 16px;
+      max-width: 520px;
+    }
+
+    /* ---------- Prompt / search ---------- */
+    .prompt {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: var(--s1);
+      border: 1.5px solid var(--ln-strong);
+      border-radius: 18px;
+      padding: 8px 8px 8px 22px;
+      max-width: 860px;
+      box-shadow: var(--shadow-sm);
+      transition: all .2s ease;
+    }
+
+    .prompt:focus-within {
+      border-color: var(--ac);
+      box-shadow: 0 0 0 4px rgba(11, 107, 93, .13), var(--shadow-md);
+    }
+
+    .prompt input {
+      flex: 1;
+      background: none;
+      border: 0;
+      outline: 0;
+      font-size: 15px;
+      min-width: 0;
+      padding: 9px 0;
+    }
+
+    .prompt input::placeholder {
+      color: #9AA1AD;
+    }
+
+    .send {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      border: 0;
+      background: var(--ac);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 12px rgba(11, 107, 93, .3);
+      transition: all .15s;
+    }
+
+    .send:hover {
+      background: var(--ac-hover);
+      transform: scale(1.05);
+    }
+
+    .send:active {
+      transform: scale(.94);
+    }
+
+    .send svg {
+      width: 18px;
+      height: 18px;
+      stroke: #fff;
+      stroke-width: 2.2;
+    }
+
+    /* ---------- Category cards ---------- */
+    .cats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+      max-width: 860px;
+    }
+
+    .cat {
+      position: relative;
+      overflow: hidden;
+      text-align: left;
+      border: 1px solid var(--ln);
+      padding: 26px;
+      background: var(--s1);
+      border-radius: var(--radius);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all .25s var(--ease);
+    }
+
+    .cat::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: var(--lime);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform .3s var(--ease);
+    }
+
+    .cat:hover {
+      transform: translateY(-4px);
+      border-color: var(--ink);
+      box-shadow: var(--shadow-md);
+    }
+
+    .cat:hover::before {
+      transform: scaleY(1);
+    }
+
+    .cat-idx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ac);
+      margin-bottom: 10px;
+      letter-spacing: .08em;
+    }
+
+    .cat h2 {
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .cat p {
+      color: var(--mu);
+      margin: 6px 0 0;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 300px;
+    }
+
+    .gl {
+      position: absolute;
+      right: 16px;
+      bottom: -14px;
+      font: 600 84px/1 var(--display);
+      color: var(--ink);
+      opacity: .05;
+      pointer-events: none;
+      transition: all .25s;
+    }
+
+    .cat:hover .gl {
+      opacity: .1;
+      transform: scale(1.06) rotate(-3deg);
+    }
+
+    /* ---------- Page headers ---------- */
+    .ch {
+      position: relative;
+      margin-bottom: 24px;
+      max-width: 860px;
+    }
+
+    .ch .gl {
+      top: -20px;
+      bottom: auto;
+      right: 0;
+      font-size: 120px;
+    }
+
+    .ch h2 {
+      font-size: clamp(28px, 3.8vw, 38px);
+    }
+
+    .ch p {
+      color: var(--mu);
+      margin: 6px 0 16px;
+      font-size: 15px;
+      max-width: 560px;
+    }
+
+    .ch input {
+      width: 100%;
+      max-width: 460px;
+      background: var(--s1);
+      border: 1px solid var(--ln-strong);
+      border-radius: 14px;
+      padding: 11px 16px;
+      font-size: 14px;
+      outline: 0;
+      transition: all .2s;
+    }
+
+    .ch input:focus {
+      border-color: var(--ac);
+      box-shadow: 0 0 0 3px rgba(11, 107, 93, .14);
+    }
+
+    /* ---------- Chips & tabs ---------- */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      border: 1px solid var(--ln-strong);
+      background: var(--s1);
+      color: var(--tx-sec);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .18s;
+    }
+
+    .chip:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .chip.on {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      background: var(--s3);
+      border-radius: 14px;
+      margin-top: 6px;
+    }
+
+    .tab {
+      border: 0;
+      background: none;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--tx-sec);
+      cursor: pointer;
+      transition: all .18s;
+    }
+
+    .tab.on {
+      background: var(--s1);
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ---------- Accordions ---------- */
+    details {
+      background: var(--s1);
+      border: 1px solid var(--ln);
+      border-left: 4px solid var(--lime);
+      border-radius: 16px;
+      margin: 0 0 10px;
+      max-width: 860px;
+      padding: 0 22px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color .2s;
+    }
+
+    details:hover {
+      border-color: var(--ln-strong);
+      border-left-color: var(--lime);
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 17px 0;
+      font: 600 17px var(--display);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      color: var(--ac);
+      font: 500 22px/1 'Inter', sans-serif;
+      transition: transform .2s;
+    }
+
+    details[open] summary::after {
+      transform: rotate(45deg);
+    }
+
+    details p {
+      margin: 0 0 8px;
+      color: var(--mu);
+    }
+
+    .none {
+      color: var(--mu);
+      padding: 28px 0;
+      font-size: 14px;
+    }
+
+    /* ---------- Chat ---------- */
+    .chat {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 115px);
+      max-width: 860px;
+    }
+
+    .chat-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    .top h2 {
+      font-size: 26px;
+    }
+
+    .ghost {
+      background: var(--s1);
+      border: 1px solid var(--ln-strong);
+      color: var(--tx-sec);
+      border-radius: 12px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      transition: all .2s;
+    }
+
+    .ghost:hover {
+      color: #fff;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .ghost svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .chat.is-empty .chat-body {
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0 50px;
+    }
+
+    .chat.is-empty .ms {
+      flex: 0 0 auto;
+      overflow: visible;
+      padding: 0;
+      width: 100%;
+    }
+
+    .chat.is-empty .em {
+      text-align: center;
+      padding: 0 16px 28px;
+    }
+
+    .chat.is-empty .em-mascot {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 14px;
+      display: inline-block;
+      filter: drop-shadow(0 8px 18px rgba(181, 211, 52, .4));
+    }
+
+    .chat.is-empty .em h4 {
+      font-size: 30px;
+      margin: 0 0 8px;
+    }
+
+    .chat.is-empty .em p {
+      color: var(--mu);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .chat.is-empty .chat-prompt {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .chat:not(.is-empty) .chat-body {
+      justify-content: flex-start;
+      align-items: stretch;
+      padding-bottom: 28px;
+    }
+
+    .chat:not(.is-empty) .ms {
+      flex: 1;
+      overflow: auto;
+      padding: 6px 4px 14px;
+    }
+
+    .chat:not(.is-empty) .chat-prompt {
+      width: 100%;
+      margin: 10px 0 24px;
+      flex-shrink: 0;
+    }
+
+    .em {
+      text-align: center;
+      padding: 40px 16px;
+    }
+
+    .em h4 {
+      font-size: 22px;
+      margin: 12px 0 6px;
+    }
+
+    .em p {
+      color: var(--mu);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .m {
+      display: flex;
+      margin: 16px 0;
+      animation: in .28s var(--ease);
+    }
+
+    .m.u {
+      justify-content: flex-end;
+    }
+
+    .b {
+      max-width: min(680px, 92%);
+    }
+
+    .u .b {
+      background: var(--ink);
+      color: #fff;
+      border-radius: 20px 20px 4px 20px;
+      padding: 12px 18px;
+      box-shadow: 0 6px 16px rgba(22, 32, 46, .2);
+    }
+
+    .a .b {
+      background: var(--s1);
+      border: 1px solid var(--ln);
+      border-left: 4px solid var(--lime);
+      border-radius: 4px 20px 20px 20px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .a h4 {
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    .a p {
+      margin: 0;
+      color: var(--tx-sec);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .src {
+      font-size: 12px;
+      color: var(--mu);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--ln-strong);
+    }
+
+    .src svg {
+      width: 15px;
+      height: 15px;
+      color: var(--ac);
+    }
+
+    .src b {
+      border: 1px solid var(--ac-subtle);
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 600;
+      color: var(--ac);
+      background: var(--ac-light);
+      font-size: 11px;
+    }
+
+    .src a.pdf-link,
+    .src b.cite-link {
+      cursor: pointer;
+    }
+
+    .src button {
+      margin-left: auto;
+      background: none;
+      border: 0;
+      color: var(--mu);
+      cursor: pointer;
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+
+    .src button:hover {
+      color: var(--ink);
+      background: var(--s2);
+    }
+
+    .btn-escalate-inline {
+      background: var(--ink);
+      color: #fff;
+      font-weight: 600;
+      border: 0;
+      border-radius: 12px;
+      padding: 9px 18px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      transition: all .2s;
+    }
+
+    .btn-escalate-inline:hover {
+      background: var(--ac);
+      transform: translateY(-1px);
+    }
+
+    .dots span {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ac);
+      margin-right: 5px;
+      animation: bl 1s infinite;
+    }
+
+    .dots span:nth-child(2) {
+      animation-delay: .15s;
+    }
+
+    .dots span:nth-child(3) {
+      animation-delay: .3s;
+    }
+
+    @keyframes bl {
+      50% {
+        opacity: .3;
+        transform: translateY(-3px);
+      }
+    }
+
+    /* ---------- Circulars ---------- */
+    .circulars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+      max-width: 900px;
+    }
+
+    .circular-card {
+      background: var(--s1);
+      border: 1px solid var(--ln);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: all .25s var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .circular-card::after {
+      content: "PDF";
+      position: absolute;
+      right: -6px;
+      top: -14px;
+      font: 700 64px/1 'JetBrains Mono', monospace;
+      color: var(--ink);
+      opacity: .04;
+    }
+
+    .circular-card:hover {
+      border-color: var(--ink);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .circular-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--mu);
+    }
+
+    .circular-meta span.cat-tag,
+    .cat-tag {
+      background: var(--lime-soft);
+      color: #566B0A;
+      padding: 3px 9px;
+      border-radius: 6px;
+      border: 1px solid #DCE9A3;
+      font-weight: 700;
+    }
+
+    .circular-title {
+      font-size: 18px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .circular-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-view-pdf {
+      flex: 1;
+      background: var(--ac-light);
+      border: 1px solid var(--ac-subtle);
+      color: var(--ac);
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .btn-view-pdf svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-view-pdf:hover {
+      background: var(--ac);
+      color: #fff;
+      border-color: var(--ac);
+    }
+
+    .btn-view-pdf.alt {
+      background: var(--s1);
+      color: var(--tx-sec);
+      border-color: var(--ln-strong);
+    }
+
+    .btn-view-pdf.alt:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    /* ---------- Tickets ---------- */
+    .tickets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 860px;
+      margin-top: 18px;
+    }
+
+    .ticket-card {
+      background: var(--s1);
+      border: 1px solid var(--ln);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ticket-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-status {
+      padding: 3px 11px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .status-pending {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    .status-resolved {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .status-rejected {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .ticket-q {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .ticket-reply {
+      background: var(--lime-soft);
+      border-left: 4px solid var(--lime);
+      padding: 13px 16px;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .ticket-reply-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #566B0A;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .ticket-reply-text {
+      font-size: 14px;
+      color: var(--tx-sec);
+    }
+
+    /* ---------- Faculty ---------- */
+    .faculty-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      max-width: 860px;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--ac-subtle);
+      background: var(--ac-light);
+      border-radius: 16px;
+      padding: 34px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .dropzone:hover {
+      background: #D3EAE4;
+      border-color: var(--ac);
+    }
+
+    .dropzone svg {
+      width: 36px;
+      height: 36px;
+      color: var(--ac);
+      margin-bottom: 10px;
+    }
+
+    .dropzone p {
+      margin: 0;
+      color: var(--mu);
+      font-size: 14px;
+    }
+
+    .dropzone p strong {
+      color: var(--tx);
+    }
+
+    .upload-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .upload-controls .select-light {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .select-light {
+      background: var(--s1);
+      border: 1px solid var(--ln-strong);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      outline: 0;
+      transition: all .2s;
+    }
+
+    .select-light:focus {
+      border-color: var(--ac);
+      box-shadow: 0 0 0 3px rgba(11, 107, 93, .14);
+    }
+
+    .btn-upload {
+      background: var(--ac);
+      color: #fff;
+      font-weight: 700;
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(11, 107, 93, .3);
+      transition: all .2s;
+    }
+
+    .btn-upload:hover {
+      background: var(--ac-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-upload:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ---------- Panels (sidebar + faculty) ---------- */
+    .pn {
+      background: var(--s1);
+      border: 1px solid var(--ln);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pn h5 {
+      margin: 0 0 12px;
+      font: 700 12px 'Inter', sans-serif;
+      color: var(--tx);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pn h5 em {
+      font-style: normal;
+      font-weight: 500;
+      font-size: 11px;
+      color: var(--mu);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .pn div.row-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-top: 1px solid var(--ln);
+      font-size: 13px;
+    }
+
+    .pn div.row-item span:last-child {
+      color: var(--mu);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .pn-link {
+      color: var(--tx);
+      font-weight: 500;
+    }
+
+    .pn a.btn-read-sm {
+      font-size: 11px;
+      color: var(--ac);
+      text-decoration: none;
+      border: 1px solid var(--ac-subtle);
+      background: var(--ac-light);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      transition: all .2s;
+    }
+
+    .pn a.btn-read-sm:hover {
+      background: var(--ac);
+      color: #fff;
+      border-color: var(--ac);
+    }
+
+    .inquiry-btn {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--ln);
+      background: var(--bg);
+      color: var(--tx-sec);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 7px;
+      display: block;
+      transition: all .2s;
+    }
+
+    .inquiry-btn:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+      transform: translateX(3px);
+    }
+
+    .empty-notice {
+      color: var(--mu);
+      font-size: 12px;
+      padding: 8px 0;
+      font-style: italic;
+    }
+
+    .note {
+      font-size: 12px;
+      color: var(--mu);
+      margin: 4px 4px 0;
+      line-height: 1.5;
+    }
+
+    /* ---------- Modals ---------- */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 32, 46, .55);
+      backdrop-filter: blur(5px);
+      display: none;
+      place-items: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal.on {
+      display: grid;
+    }
+
+    .modal-box {
+      background: var(--s1);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      padding: 30px;
+      box-shadow: 0 30px 70px -15px rgba(22, 32, 46, .4);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      animation: in .22s var(--ease);
+    }
+
+    .modal-box.wide {
+      max-width: 900px;
+      height: calc(100vh - 48px);
+    }
+
+    .modal-box h3 {
+      font-size: 24px;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--tx-sec);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .modal-field input,
+    .modal-field select,
+    .modal-field textarea {
+      background: var(--s1);
+      border: 1px solid var(--ln-strong);
+      border-radius: 12px;
+      padding: 11px 14px;
+      outline: 0;
+      font-size: 14px;
+      transition: all .2s;
+    }
+
+    .modal-field input:focus,
+    .modal-field select:focus,
+    .modal-field textarea:focus {
+      border-color: var(--ac);
+      box-shadow: 0 0 0 3px rgba(11, 107, 93, .14);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .guidelines {
+      background: var(--s2);
+      border: 1px solid var(--ln);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--tx-sec);
+      line-height: 1.55;
+    }
+
+    .guidelines li {
+      margin: 4px 0;
+    }
+
+    .qr-wrap {
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: var(--s2);
+      border-radius: 18px;
+      min-height: 232px;
+      text-align: center;
+      color: var(--mu);
+      font-size: 13px;
+    }
+
+    .qr-wrap canvas,
+    .qr-wrap img {
+      border-radius: 8px;
+    }
+
+    .pdf-frame {
+      flex: 1;
+      width: 100%;
+      border: 1px solid var(--ln);
+      border-radius: 14px;
+      background: var(--s2);
+      min-height: 0;
+    }
+
+    /* ---------- Alerts & toasts ---------- */
+    .alert {
+      padding: 9px 13px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 500;
+      display: none;
+    }
+
+    .alert.on {
+      display: block;
+    }
+
+    .alert-err {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .alert-ok {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .alert-info {
+      background: var(--ac-light);
+      color: var(--ac);
+      border: 1px solid var(--ac-subtle);
+    }
+
+    .toast-wrap {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      min-width: 240px;
+      max-width: 360px;
+      background: var(--ink);
+      color: #fff;
+      padding: 13px 18px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      border-left: 4px solid var(--lime);
+      box-shadow: var(--shadow-md);
+      animation: in .3s var(--ease);
+    }
+
+    .toast.err {
+      border-left-color: #F04438;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1280px) {
+      .app {
+        grid-template-columns: 92px minmax(0, 1fr) 290px;
+      }
+
+      aside {
+        padding: 24px 18px 48px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .app {
+        grid-template-columns: 92px minmax(0, 1fr);
+      }
+
+      aside {
+        display: none;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .app {
+        display: block;
+        overflow: auto;
+      }
+
+      .rail {
+        position: fixed;
+        flex-direction: row;
+        left: 10px;
+        right: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        justify-content: space-around;
+        border-radius: 24px;
+        overflow-x: auto;
+      }
+
+      .rail button {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+      }
+
+      .rail button::after {
+        display: none;
+      }
+
+      main {
+        overflow: visible;
+        padding: 16px 18px calc(96px + env(safe-area-inset-bottom, 0px));
+      }
+
+      body[data-v=chat] main {
+        overflow: hidden;
+        height: 100%;
+        padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .cats {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        padding: 0 0 14px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+
+      .btn-qr span {
+        display: none;
+      }
+
+      .hero {
+        padding: 4px 0;
+      }
+
+      .top h2 {
+        font-size: 22px;
+      }
+
+      .modal-box.wide {
+        height: calc(100vh - 32px);
+      }
+    }
+  </style>
+</head>
+
+<body data-v="home">
+  <div class="app">
+    <!-- Left Navigation Rail -->
+    <nav class="rail" id="rail" aria-label="Campus navigation"></nav>
+
+    <!-- Main Container -->
+    <main>
+      <!-- Top Navigation Header -->
+      <div class="topbar">
+        <div class="topbar-brand" onclick="go('home')" title="Analyzer">
+          <svg class="brand-mascot" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+            aria-label="Analyzer Mascot">
+            <!-- Antenna stem -->
+            <line x1="50" y1="18" x2="50" y2="28" stroke="#2D3134" stroke-width="5" stroke-linecap="round" />
+            <!-- Antenna ball -->
+            <circle cx="50" cy="12" r="5.5" fill="#B5D334" stroke="#2D3134" stroke-width="4.5" />
+            <!-- Head -->
+            <rect x="22" y="27" width="56" height="34" rx="14" fill="#B5D334" stroke="#2D3134" stroke-width="4.5"
+              stroke-linejoin="round" />
+            <!-- Eyes -->
+            <circle cx="37" cy="40.5" r="4.8" fill="#2D3134" />
+            <circle cx="35.3" cy="38.8" r="1.4" fill="#FFFFFF" />
+            <circle cx="63" cy="40.5" r="4.8" fill="#2D3134" />
+            <circle cx="61.3" cy="38.8" r="1.4" fill="#FFFFFF" />
+            <!-- Mouth -->
+            <rect x="45" y="42" width="10" height="3.5" rx="1.75" fill="#2D3134" />
+            <!-- Side hands -->
+            <circle cx="15.5" cy="67" r="4.8" fill="#B5D334" stroke="#2D3134" stroke-width="4.5" />
+            <circle cx="84.5" cy="67" r="4.8" fill="#B5D334" stroke="#2D3134" stroke-width="4.5" />
+            <!-- Open Book -->
+            <path d="M50 55 C43 51.5 29 48 15.5 48.5 L15.5 83.5 C29 83 43 86.5 50 91.5 Z" fill="#F1F3F5"
+              stroke="#2D3134" stroke-width="4.5" stroke-linejoin="round" />
+            <path d="M50 55 C57 51.5 71 48 84.5 48.5 L84.5 83.5 C71 83 57 86.5 50 91.5 Z" fill="#E4E7EB"
+              stroke="#2D3134" stroke-width="4.5" stroke-linejoin="round" />
+            <line x1="50" y1="55" x2="50" y2="91.5" stroke="#2D3134" stroke-width="4.5" stroke-linecap="round" />
+          </svg>
+          <div class="brand-lockup">
+            <span class="brand-wordmark">Analyzer</span>
+            <svg class="brand-swash" viewBox="0 0 110 12" fill="none" xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true">
+              <path d="M4 3 C36 9, 78 11, 106 3.5" stroke="#1E293B" stroke-width="2.6" stroke-linecap="round" />
+            </svg>
+          </div>
+        </div>
+        <div class="topbar-actions" id="auth-actions">
+          <!-- Dynamically populated: Guest (Register / Sign In) or Authenticated (Role Pill / Sign Out) -->
+        </div>
+      </div>
+
+      <!-- VIEW 1: HOME -->
+      <section class="v on" id="v-home">
+        <div class="hero">
+          <h1>Your Campus.<span>One Intelligent Space.</span></h1>
+          <p>Find answers from official college notices and circulars.</p>
+        </div>
+
+        <div class="prompt" style="margin-top:24px">
+          <input id="hq" placeholder="Ask any question about college circulars, fees, exams, or campus rules..."
+            aria-label="Ask a question" enterkeyhint="send">
+          <button class="send" id="hs" aria-label="Ask"></button>
+        </div>
+        <div class="cats" id="cats"></div>
+      </section>
+
+      <!-- VIEW 2: CATEGORY DETAIL -->
+      <section class="v" id="v-cat"></section>
+
+      <!-- VIEW 3: AI ASSISTANT CHAT -->
+      <section class="v" id="v-chat">
+        <div class="chat is-empty" id="chat-container">
+          <div class="top">
+            <h2>Campus Help Desk</h2>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="ghost" id="btn-clear-chat" title="Clear Chat History" style="display:none;"></button>
+              <button class="ghost" id="nb"></button>
+            </div>
+          </div>
+          <div class="chat-body" id="chat-body">
+            <div class="ms" id="ms" aria-live="polite"></div>
+            <div class="prompt chat-prompt" id="chat-prompt">
+              <input id="cq" placeholder="Type your question..." aria-label="Your question" enterkeyhint="send">
+              <button class="send" id="cs" aria-label="Send"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: CIRCULARS (PDF LIBRARY) -->
+      <section class="v" id="v-circulars">
+        <div class="ch" style="--a:#2563EB">
+          <span class="gl">PDF</span>
+          <h2>Official Circulars</h2>
+          <p>Browse verified notices, regulations, and official circulars published by college administration.</p>
+          <input id="cf" placeholder="Filter circulars by title or category..." aria-label="Filter circulars">
+          <div class="chips" id="circ-chips"></div>
+        </div>
+        <div class="circulars-grid" id="circulars-list"></div>
+      </section>
+
+      <!-- VIEW 5: MY TICKETS (FOR STUDENTS) -->
+      <section class="v" id="v-tickets">
+        <div class="ch" style="--a:#2563EB">
+          <span class="gl">T</span>
+          <h2>My Inquiries</h2>
+          <p>Track inquiries escalated to departmental faculty desks and review official written replies.</p>
+          <div class="tabs" role="tablist">
+            <button class="tab on" id="tab-all" onclick="setTicketTab('all')">All</button>
+            <button class="tab" id="tab-open" onclick="setTicketTab('open')">Open</button>
+            <button class="tab" id="tab-answered" onclick="setTicketTab('answered')">Answered</button>
+          </div>
+        </div>
+        <div class="tickets-list" id="my-tickets-list"></div>
+      </section>
+
+      <!-- VIEW 7: CHAT HISTORY (30 DAYS) -->
+      <section class="v" id="v-history">
+        <div class="ch">
+          <span class="gl">30d</span>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <h2>Chat History</h2>
+            <span class="cat-tag">Auto-saved for 30 Days</span>
+          </div>
+          <p>Review your recent campus help desk conversations and click any inquiry to resume in chat.</p>
+        </div>
+        <div class="tickets-list" id="history-list"></div>
+      </section>
+
+      <!-- VIEW 6: FACULTY DESK (FOR TEACHERS & ADMIN) -->
+      <section class="v" id="v-faculty">
+        <div class="ch" style="--a:#2563EB">
+          <span class="gl">Desk</span>
+          <h2>Faculty Administration Desk</h2>
+          <p>Publish official PDF notices and resolve escalated student inquiries.</p>
+        </div>
+
+        <div class="faculty-layout">
+          <!-- Upload Circular Dropzone -->
+          <div class="pn">
+            <h5>Upload Official Circular<em>PDF, Word, PPT, Excel, CSV, or Image</em></h5>
+            <div class="dropzone" id="faculty-dropzone" onclick="$('#file-input').click()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+              </svg>
+              <p><strong id="file-label">Click or drop official circular (PDF, DOCX, PPTX, XLSX, CSV, or Image)</strong>
+              </p>
+              <input type="file" id="file-input" accept=".pdf,.docx,.pptx,.xlsx,.xls,.csv,.png,.jpg,.jpeg,.webp"
+                style="display:none">
+            </div>
+            <div class="upload-controls">
+              <input type="text" id="upload-title" class="select-light" placeholder="Circular title" maxlength="150"
+                style="flex:2;min-width:180px">
+              <select id="upload-category" class="select-light">
+                <option value="General">General</option>
+                <option value="Fees & Aid">Fees &amp; Aid</option>
+                <option value="Examinations">Examinations</option>
+                <option value="Admissions">Admissions</option>
+                <option value="Student Life">Student Life</option>
+              </select>
+              <button class="btn-upload" id="btn-upload-file">Upload Circular</button>
+            </div>
+            <div id="upload-alert" class="alert" style="margin-top:10px"></div>
+          </div>
+
+          <!-- Manage Published Circulars Panel -->
+          <div class="pn">
+            <h5>Manage Published Circulars<em>Live circular repository</em></h5>
+            <div id="faculty-circulars-list" style="margin-top:10px"></div>
+          </div>
+
+          <!-- Publish Academic Key Date Form -->
+          <div class="pn">
+            <h5>Announce Academic Key Date<em>Displays on Campus Key Dates panel</em></h5>
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;margin-top:10px">
+              <input type="text" id="keydate-title" placeholder="e.g. Semester Fee Deadline" class="select-light">
+              <input type="text" id="keydate-date" placeholder="e.g. 15 Jan 2026" class="select-light">
+              <button class="btn-auth primary" id="btn-add-keydate">Add Date</button>
+            </div>
+            <div id="keydate-alert" class="alert" style="margin-top:8px"></div>
+            <div id="faculty-dates-list" style="margin-top:14px;border-top:1px solid var(--ln);padding-top:10px"></div>
+          </div>
+
+          <!-- Triage Ledger for Student Tickets -->
+          <div class="pn">
+            <h5>Pending Student Tickets<em>Real-time escalation queue</em></h5>
+            <div class="tickets-list" id="faculty-tickets-list" style="margin-top:10px"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside id="side"></aside>
+  </div>
+
+  <!-- Modal: Sign In -->
+  <div class="modal" id="modal-signin">
+    <div class="modal-box">
+      <h3>Sign In</h3>
+      <div class="modal-field">
+        <label for="signin-username">Roll Number or Employee ID</label>
+        <input type="text" id="signin-username" placeholder="e.g. 21CS042 or faculty1">
+      </div>
+      <div class="modal-field">
+        <label for="signin-password">Password</label>
+        <input type="password" id="signin-password" placeholder="Your password">
+      </div>
+      <div class="alert" id="signin-alert"></div>
+      <div style="font-size:13px;color:var(--mu);text-align:center">
+        New user? <a href="#" onclick="event.preventDefault();openModal('modal-register')"
+          style="color:var(--ac);font-weight:600;text-decoration:none">Create an account</a>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-auth" onclick="closeModals()">Cancel</button>
+        <button class="btn-auth primary" id="btn-do-signin">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Register -->
+  <div class="modal" id="modal-register">
+    <div class="modal-box">
+      <h3>Register Account</h3>
+      <div class="modal-field">
+        <label for="reg-name">Full Name</label>
+        <input type="text" id="reg-name" placeholder="e.g. Aditi Rao">
+      </div>
+      <div class="modal-field">
+        <label for="reg-username">Roll Number or Employee ID</label>
+        <input type="text" id="reg-username" placeholder="e.g. 21CS042 or prof_rao">
+      </div>
+      <div class="modal-field">
+        <label for="reg-role">Role</label>
+        <select id="reg-role" class="select-light">
+          <option value="student">Student</option>
+          <option value="faculty">Teacher / Faculty</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="reg-department">Department / Branch</label>
+        <input type="text" id="reg-department" placeholder="e.g. Computer Science, Mechanical">
+      </div>
+      <div class="modal-field" id="reg-faculty-code-group" style="display:none;">
+        <label for="reg-faculty-code">Faculty Authorization Code</label>
+        <input type="password" id="reg-faculty-code" placeholder="Enter faculty authorization code">
+      </div>
+      <div class="modal-field">
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" placeholder="At least 4 characters">
+      </div>
+      <div class="alert" id="reg-alert"></div>
+      <div style="font-size:13px;color:var(--mu);text-align:center">
+        Already have an account? <a href="#" onclick="event.preventDefault();openModal('modal-signin')"
+          style="color:var(--ac);font-weight:600;text-decoration:none">Sign In</a>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-auth" onclick="closeModals()">Cancel</button>
+        <button class="btn-auth primary" id="btn-do-register">Create Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Escalation to Faculty Desk -->
+  <div class="modal" id="modal-escalate">
+    <div class="modal-box">
+      <h3>Escalate to Faculty Desk</h3>
+      <div class="modal-field">
+        <label for="escalate-query-preview">Your Inquiry (up to 200 words)</label>
+        <textarea id="escalate-query-preview" class="select-light"
+          style="width:100%;min-height:90px;resize:vertical;font-size:14px;padding:10px;line-height:1.5"
+          placeholder="Describe your college-related inquiry clearly..." maxlength="2000"></textarea>
+      </div>
+      <div class="guidelines">
+        <strong>Desk Guidelines:</strong>
+        <ul style="margin:6px 0 0;padding-left:18px">
+          <li>Describe your college-related inquiry clearly (up to 200 words).</li>
+          <li>Campus operational and academic questions only.</li>
+          <li>Academic dishonesty, exam cheating, or proxy requests are barred.</li>
+          <li>Inappropriate language will be automatically blocked.</li>
+          <li>Limit: Maximum 5 escalated questions per student per day.</li>
+        </ul>
+      </div>
+      <div class="alert" id="escalate-alert"></div>
+      <div class="modal-actions">
+        <button class="btn-auth" onclick="closeModals()">Cancel</button>
+        <button class="btn-auth primary" id="btn-do-escalate">Confirm Escalation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Android app QR -->
+  <div class="modal" id="modal-qr">
+    <div class="modal-box" style="text-align:center">
+      <h3>Get the Android App</h3>
+      <div class="qr-wrap" id="qr-box"></div>
+      <p style="margin:0;color:var(--mu);font-size:13px">Scan with your phone camera to install Analyzer.</p>
+      <div class="modal-actions"><button class="btn-auth" onclick="closeModals()">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Modal: PDF preview -->
+  <div class="modal" id="modal-preview">
+    <div class="modal-box wide">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <h3 id="preview-title" style="font-size:20px;word-break:break-word"></h3>
+        <button class="btn-auth" onclick="closePreview()">Close</button>
+      </div>
+      <iframe class="pdf-frame" id="preview-frame" title="PDF preview"></iframe>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+
+    // SVG Path Library
+    const P = {
+      home: "M3 11l9-8 9 8M5 10v10h14V10",
+      circulars: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8",
+      fees: "M3 6h18v12H3zM3 10h18M7 15h3",
+      exams: "M6 3h9l3 3v15H6zM9 11h6M9 15h6",
+      adm: "M2 9l10-5 10 5-10 5zM6 12v5c4 3 8 3 12 0v-5",
+      life: "M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6L12 16.5 6.6 19.4l1.2-6L3.4 9.3l6-.7z",
+      chat: "M4 5h16v11H9l-5 4z",
+      tickets: "M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z",
+      faculty: "M12 14l9-5-9-5-9 5 9 5zM12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z",
+      send: "M4 12L20 4l-6 16-3-7z",
+      plus: "M12 5v14M5 12h14",
+      trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2",
+      check: "M5 12l5 5 9-10",
+      copy: "M9 9h11v11H9zM5 15V4h11",
+      file: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6",
+      qr: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM20 14v3M14 20h3M20 20v1",
+      history: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+      general: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"
+    };
+
+    // Set this to the real download link (APK / Play Store) of your Android app.
+    const APP_DOWNLOAD_URL = "";
+    const CIRC_CATEGORIES = ["All", "General", "Fees & Aid", "Examinations", "Admissions", "Student Life"];
+    const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${P[n] || P.home}"/></svg>`;
+
+    const CATS = {
+      general: { t: "General", g: "Gn", a: "#2563EB", d: "General campus notices, holiday announcements, and administrative circulars." },
+      fees: { t: "Fees & Aid", g: "₹", a: "#2563EB", d: "Fee schedules, payment methods, and scholarship information." },
+      exams: { t: "Examinations", g: "Ex", a: "#2563EB", d: "Timetables, hall tickets, seating, and evaluation notices." },
+      adm: { t: "Admissions", g: "Ad", a: "#2563EB", d: "Eligibility criteria, enrollment requirements, and certificates." },
+      life: { t: "Student Life", g: "✦", a: "#2563EB", d: "Hostel timings, mess schedules, clubs, and facilities." }
+    };
+
+    // App State - zero pre-seeded user data
+    let state = {
+      token: localStorage.getItem('ci_token') || null,
+      user: JSON.parse(localStorage.getItem('ci_user') || 'null'),
+      view: 'home',
+      circulars: [],
+      keyDates: [],
+      popularQueries: [],
+      selectedFile: null,
+      escalateQuery: ''
+    };
+
+    const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    function formatAnswerText(text) {
+      if (!text) return "";
+      // Strip any accidental inline notices or document/page citations
+      let clean = String(text).replace(/\[(?:Notice|Document|Page):[^\]]+\]/gi, '').trim();
+      // Safely escape HTML to prevent XSS
+      let escaped = esc(clean);
+      // Safely render **bold** segments inside the answer bubble as <strong>...</strong>
+      return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    // Validate Session on Startup to guarantee no ghost logins
+    async function validateSessionOnStartup() {
+      if (!state.token) {
+        updateAuthUI();
+        renderSidebarWidgets();
+        return;
+      }
+      try {
+        const res = await fetch('/api/v1/auth/me', {
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        if (!res.ok) {
+          throw new Error('Session invalid');
+        }
+        const user = await res.json();
+        state.user = user;
+        localStorage.setItem('ci_user', JSON.stringify(user));
+        updateAuthUI();
+        renderSidebarWidgets();
+        loadCirculars();
+        loadKeyDates();
+        loadPopularQueries();
+        loadChatHistory();
+      } catch (err) {
+        // Clear stale session immediately
+        localStorage.removeItem('ci_token');
+        localStorage.removeItem('ci_user');
+        state.token = null;
+        state.user = null;
+        updateAuthUI();
+        renderSidebarWidgets();
+      }
+    }
+
+    // Render Navigation Rail with strict RBAC
+    function renderRail() {
+      const nav = [
+        ["home", "Overview"],
+        ["circulars", "Circulars"],
+        ["general", "General"],
+        ["fees", "Fees & Aid"],
+        ["exams", "Examinations"],
+        ["adm", "Admissions"],
+        ["life", "Student Life"],
+        ["chat", "Help Desk"]
+      ];
+
+      if (state.user) {
+        if (state.user.role === 'student') {
+          nav.push(["tickets", "My Tickets"]);
+        } else if (state.user.role === 'faculty' || state.user.role === 'superadmin' || state.user.role === 'admin') {
+          nav.push(["faculty", "Faculty Desk"]);
+        }
+        nav.push(["history", "Chat History"]);
+      }
+
+      const rail = $("#rail");
+      if (rail) {
+        rail.innerHTML = nav.map(([id, label]) => `
+  <button data-go="${id}" data-l="${label}" aria-label="${label}">
+    ${ic(id)}
+    ${(id === 'tickets' && state.unseen && state.unseen.length) ? `<span class="rail-badge">${state.unseen.length}</span>` : ''}
+  </button>
+`).join("");
+      }
+    }
+
+    // Update Header Authentication Actions
+    function updateAuthUI() {
+      const box = $("#auth-actions");
+      if (!box) return;
+      if (state.token && state.user) {
+        const roleUpper = (state.user.role || 'USER').toUpperCase();
+        const handle = state.user.username;
+        box.innerHTML = `
+  <button class="btn-auth btn-qr" onclick="openQrModal()" title="Scan to get the Android app">${ic("qr")}<span>Get Android App</span></button>
+  <span class="role-pill">${roleUpper} · ${esc(handle)}</span>
+  <button class="btn-auth" onclick="signOut()">Sign Out</button>
+`;
+      } else {
+        box.innerHTML = `
+  <button class="btn-auth btn-qr" onclick="openQrModal()" title="Scan to get the Android app">${ic("qr")}<span>Get Android App</span></button>
+  <button class="btn-auth" onclick="openModal('modal-register')">Register</button>
+  <button class="btn-auth primary" onclick="openModal('modal-signin')">Sign In</button>
+`;
+      }
+      renderRail();
+    }
+
+    // Clean Sign Out
+    function signOut() {
+      localStorage.removeItem('ci_token');
+      localStorage.removeItem('ci_user');
+      state.token = null;
+      state.user = null;
+      state.selectedFile = null;
+      state.escalateQuery = '';
+      state.circulars = [];
+      state.keyDates = [];
+      state.popularQueries = [];
+      updateAuthUI();
+      resetChat();
+      const clearBtn = $("#btn-clear-chat");
+      if (clearBtn) clearBtn.style.display = "none";
+      renderSidebarWidgets();
+      go('home');
+    }
+
+    // Show Auth Gate Notice on Guest Intercept
+    function showAuthGateNotice(msg) {
+      openModal('modal-signin');
+      const alertEl = $("#signin-alert");
+      if (alertEl) {
+        alertEl.textContent = msg || "Please sign in to ask questions and access campus circulars.";
+        alertEl.className = "alert alert-info on";
+      }
+    }
+
+    // Switch View Sections
+    function go(v) {
+      if (!state.token && v !== "home") {
+        showAuthGateNotice("Please sign in to ask questions and access campus circulars.");
+        return;
+      }
+      state.view = v;
+      document.body.dataset.v = (v === "chat") ? "chat" : (v in CATS) ? "cat" : v;
+      $$(".v").forEach(s => s.classList.remove("on"));
+
+      const targetId = (v === "chat") ? "#v-chat" :
+        (v in CATS) ? "#v-cat" :
+          (v === "circulars") ? "#v-circulars" :
+            (v === "tickets") ? "#v-tickets" :
+              (v === "faculty") ? "#v-faculty" :
+                (v === "history") ? "#v-history" : "#v-home";
+
+      const targetEl = $(targetId);
+      if (targetEl) targetEl.classList.add("on");
+
+      $$("#rail button").forEach(b => {
+        if (b.dataset.go === v) b.setAttribute("aria-current", "page");
+        else b.removeAttribute("aria-current");
+      });
+
+      if (v in CATS) renderCategoryView(v);
+      if (v === "circulars") loadCirculars();
+      if (v === "tickets") loadMyTickets();
+      if (v === "faculty") loadFacultyDesk();
+      if (v === "history") renderHistoryView();
+
+      $("main").scrollTop = 0;
+      window.scrollTo(0, 0);
+    }
+
+    // Render Category Detail View - Purely dynamic from uploaded circulars
+    function renderCategoryView(id) {
+      const c = CATS[id];
+      $("#v-cat").innerHTML = `
+<header class="ch" style="--a:${c.a}">
+  <span class="gl">${c.g}</span>
+  <h2>${c.t}</h2>
+  <p>${c.d}</p>
+  <input id="f" placeholder="Search ${c.t} notices..." aria-label="Filter ${c.t}">
+</header>
+<div id="cl"></div>
+`;
+
+      const renderList = (filterText = "") => {
+        const matchedDocs = state.circulars.filter(doc =>
+          doc.category.toLowerCase() === c.t.toLowerCase() ||
+          doc.category.toLowerCase().includes(id) ||
+          c.t.toLowerCase().includes(doc.category.toLowerCase())
+        );
+
+        const items = matchedDocs.map(d => ({
+          id: d.id,
+          t: d.title || d.filename.replace(/\.pdf$/i, ''),
+          s: `Official published document in ${d.category} (${d.total_pages || 1} pages).`,
+          src: `College Circular: ${d.filename}`,
+          file_url: (d.file_url || `/api/v1/circulars/${d.id}/file`) + (state.token ? `?token=${encodeURIComponent(state.token)}` : '')
+        }));
+
+        const filtered = items.filter(e => (e.t + " " + e.s).toLowerCase().includes(filterText.toLowerCase()));
+
+        if (filtered.length === 0) {
+          $("#cl").innerHTML = `<p class="none">No official notices published in this category yet. Check back soon or visit the Circulars library.</p>`;
+          return;
+        }
+
+        $("#cl").innerHTML = filtered.map(e => `
+  <details style="--a:${c.a}">
+    <summary>${esc(e.t)}</summary>
+    <p>${esc(e.s)}</p>
+    <p style="font-size:12px;color:var(--mu);margin-top:8px">${esc(e.src)}</p>
+    <div style="margin:10px 0 16px;display:flex;gap:8px">
+      <a href="${e.file_url}" target="_blank" rel="noopener" class="btn-view-pdf" style="max-width:180px">
+        ${ic("file")} View Official File
+      </a>
+    </div>
+  </details>
+`).join("");
+      };
+
+      renderList();
+      $("#f").oninput = e => renderList(e.target.value);
+    }
+
+    // Chat Engine
+    const getMs = () => $("#ms");
+    function resetChat() {
+      const ms = getMs();
+      if (!ms) return;
+      ms.innerHTML = `
+<div class="em" id="em">
+  <div class="em-mascot">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%" aria-hidden="true">
+      <line x1="50" y1="18" x2="50" y2="28" stroke="#2D3134" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="50" cy="12" r="5.5" fill="#B5D334" stroke="#2D3134" stroke-width="4.5"/>
+      <rect x="22" y="27" width="56" height="34" rx="14" fill="#B5D334" stroke="#2D3134" stroke-width="4.5" stroke-linejoin="round"/>
+      <circle cx="37" cy="40.5" r="4.8" fill="#2D3134"/>
+      <circle cx="35.3" cy="38.8" r="1.4" fill="#FFFFFF"/>
+      <circle cx="63" cy="40.5" r="4.8" fill="#2D3134"/>
+      <circle cx="61.3" cy="38.8" r="1.4" fill="#FFFFFF"/>
+      <rect x="45" y="42" width="10" height="3.5" rx="1.75" fill="#2D3134"/>
+      <circle cx="15.5" cy="67" r="4.8" fill="#B5D334" stroke="#2D3134" stroke-width="4.5"/>
+      <circle cx="84.5" cy="67" r="4.8" fill="#B5D334" stroke="#2D3134" stroke-width="4.5"/>
+      <path d="M50 55 C43 51.5 29 48 15.5 48.5 L15.5 83.5 C29 83 43 86.5 50 91.5 Z" fill="#F1F3F5" stroke="#2D3134" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M50 55 C57 51.5 71 48 84.5 48.5 L84.5 83.5 C71 83 57 86.5 50 91.5 Z" fill="#E4E7EB" stroke="#2D3134" stroke-width="4.5" stroke-linejoin="round"/>
+      <line x1="50" y1="55" x2="50" y2="91.5" stroke="#2D3134" stroke-width="4.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <h4>How can I help you today?</h4>
+  <p>Ask any question about college circulars, fees, exams, or campus rules.</p>
+</div>
+`;
+      const chatContainer = $("#chat-container") || $(".chat");
+      if (chatContainer) chatContainer.classList.add("is-empty");
+    }
+
+    const addMsg = (cls, html) => {
+      const em = $("#em");
+      if (em) em.remove();
+      const chatContainer = $("#chat-container") || $(".chat");
+      if (chatContainer) chatContainer.classList.remove("is-empty");
+      const ms = getMs();
+      if (!ms) return null;
+      const d = document.createElement("div");
+      d.className = "m " + cls;
+      d.innerHTML = html;
+      ms.appendChild(d);
+      ms.scrollTop = ms.scrollHeight;
+      return d;
+    };
+
+    async function ask(query) {
+      if (!state.token) {
+        showAuthGateNotice("Please sign in to ask questions and access campus circulars.");
+        return;
+      }
+      const q = (query || "").trim();
+      if (!q) return;
+
+      go("chat");
+      addMsg("u", `<div class="b">${esc(q)}</div>`);
+      const clearBtn = $("#btn-clear-chat");
+      if (clearBtn) clearBtn.style.display = "inline-flex";
+
+      const typing = addMsg("a", `<div class="b dots" aria-label="Searching records"><span></span><span></span><span></span></div>`);
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (state.token) {
+          headers['Authorization'] = `Bearer ${state.token}`;
+        }
+
+        const response = await fetch('/api/v1/query', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ query: q })
+        });
+
+        const rawText = await response.text();
+        if (typing) typing.remove();
+
+        let data;
+        try {
+          data = JSON.parse(rawText);
+        } catch (jsonErr) {
+          throw new Error("Campus query service temporarily unavailable. Please try again shortly.");
+        }
+
+        if (!response.ok) {
+          throw new Error(data.detail || data.message || "Failed to process campus inquiry.");
+        }
+
+        if (data.status === 'answered' && data.answer) {
+          let citationsHtml = '';
+          const topCit = (data.citations && data.citations.length > 0) ? data.citations[0] : null;
+          if (topCit) {
+            citationsHtml = `
+      <div class="src">
+        ${ic("check")}
+        <b class="cite-link" role="button" tabindex="0" onclick="openCitation('${esc(topCit.filename).replace(/'/g, "\\'")}', ${Number(topCit.page_number) || 1})">[Notice: ${esc(topCit.filename)}, Page: ${topCit.page_number}]</b>
+        <button data-copy aria-label="Copy answer">${ic("copy")}<span>Copy</span></button>
+      </div>
+    `;
+          }
+
+          addMsg("a", `
+    <div class="b">
+      <h4>Official Information</h4>
+      <p>${formatAnswerText(data.answer)}</p>
+      ${citationsHtml}
+    </div>
+  `);
+          // Refresh popular queries dynamically in background
+          loadPopularQueries();
+        } else {
+          state.escalateQuery = q;
+          const fallbackMsg = data.message || "I couldn't find verified details about this in the available campus circulars.";
+          addMsg("a", `
+    <div class="b">
+      <h4>Notice</h4>
+      <p>${esc(fallbackMsg)}</p>
+      <div style="margin-top:10px">
+        <button class="btn-escalate-inline" onclick="openEscalateModal('${esc(q)}')">
+          Escalate to Faculty Desk →
+        </button>
+      </div>
+    </div>
+  `);
+        }
+      } catch (err) {
+        if (typing) typing.remove();
+        addMsg("a", `
+  <div class="b" style="border-left-color:var(--danger)">
+    <p style="color:var(--danger)">Could not connect to the campus help desk: ${esc(err.message)}</p>
+  </div>
+`);
+      }
+    }
+
+    // Circulars PDF Library Loader
+    async function loadCirculars() {
+      if (!state.token) return;
+      const listEl = $("#circulars-list");
+      if (listEl) listEl.innerHTML = '<div class="none">Loading official circulars...</div>';
+
+      try {
+        const res = await fetch('/api/v1/circulars', {
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        if (!res.ok) throw new Error("Authentication required or failed to load circulars.");
+        const rawDocs = await res.json(); const docs = Array.isArray(rawDocs) ? rawDocs : (rawDocs.circulars || rawDocs.items || []);
+        state.circulars = docs;
+
+        applyCircFilter();
+        renderSidebarWidgets();
+      } catch (err) {
+        if (listEl) listEl.innerHTML = `<div class="none">Error loading circulars: ${esc(err.message)}</div>`;
+      }
+    }
+
+    function renderCircularCards(docs) {
+      const listEl = $("#circulars-list");
+      if (!listEl) return;
+      if (!docs || docs.length === 0) {
+        listEl.innerHTML = `
+  <div class="none" style="grid-column:1/-1">
+    No circular documents published yet. Faculty members can upload official notices in the Faculty Desk.
+  </div>
+`;
+        return;
+      }
+
+      listEl.innerHTML = docs.map(doc => {
+        const fileUrl = (doc.file_url || `/api/v1/circulars/${doc.id}/file`) + (state.token ? `?token=${encodeURIComponent(state.token)}` : '');
+        const dateStr = doc.created_at ? new Date(doc.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+        return `
+  <div class="circular-card">
+    <div>
+      <div class="circular-meta">
+        <span class="cat-tag">${esc(doc.category)}</span>
+        <span>${doc.total_pages || 1} pages</span>
+      </div>
+      <h3 class="circular-title" style="margin-top:10px">${esc(doc.title || doc.filename)}</h3>
+      <p style="font-size:12px;color:var(--mu);margin-top:6px">Published on ${dateStr}</p>
+    </div>
+    <div class="circular-actions">
+      <button class="btn-view-pdf alt" onclick="previewPdf('${fileUrl}', '${esc(doc.title || doc.filename).replace(/'/g, "\\'")}')">Preview</button>
+      <a href="${fileUrl}" target="_blank" rel="noopener" class="btn-view-pdf">
+        ${ic("file")} View File
+      </a>
+    </div>
+  </div>
+`;
+      }).join('');
+    }
+
+    // Filter Circulars
+    function applyCircFilter() {
+      const term = (($("#cf") || {}).value || "").toLowerCase();
+      const cat = state.circCat || "All";
+      const filtered = (state.circulars || []).filter(d =>
+        (cat === "All" || d.category === cat) &&
+        ((d.title || "") + " " + d.filename + " " + d.category).toLowerCase().includes(term)
+      );
+      renderCircularCards(filtered);
+    }
+
+    function renderCircChips() {
+      const el = $("#circ-chips");
+      if (!el) return;
+      el.innerHTML = CIRC_CATEGORIES.map(c =>
+        `<button class="chip ${(state.circCat || 'All') === c ? 'on' : ''}" data-chip="${esc(c)}">${esc(c)}</button>`
+      ).join("");
+      el.querySelectorAll(".chip").forEach(b => {
+        b.onclick = () => { state.circCat = b.dataset.chip; renderCircChips(); applyCircFilter(); };
+      });
+    }
+
+    const cfInput = $("#cf");
+    if (cfInput) cfInput.oninput = applyCircFilter;
+
+    // PDF preview modal
+    function previewPdf(url, title) {
+      $("#preview-title").textContent = title || "Circular";
+      $("#preview-frame").src = url;
+      $("#modal-preview").classList.add("on");
+    }
+    function closePreview() {
+      $("#preview-frame").src = "about:blank";
+      $("#modal-preview").classList.remove("on");
+    }
+
+    // Clickable citation: open the cited circular at the cited page
+    function openCitation(filename, page) {
+      const doc = (state.circulars || []).find(d => d.filename === filename);
+      if (!doc) { toast("That circular is no longer available.", true); return; }
+      const url = (doc.file_url || `/api/v1/circulars/${doc.id}/file`) + (state.token ? `?token=${encodeURIComponent(state.token)}` : '') + `#page=${page || 1}`;
+      previewPdf(url, `${doc.title || doc.filename} — page ${page || 1}`);
+    }
+
+    // Toasts
+    function toast(msg, isErr) {
+      const wrap = $("#toasts");
+      if (!wrap) return;
+      const t = document.createElement("div");
+      t.className = "toast" + (isErr ? " err" : "");
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(() => t.remove(), 5000);
+    }
+
+    // Android app QR
+    function openQrModal() {
+      openModal('modal-qr');
+      const box = $("#qr-box");
+      box.innerHTML = "";
+      if (!APP_DOWNLOAD_URL) {
+        box.textContent = "The Android app link has not been configured yet.";
+        return;
+      }
+      if (typeof QRCode === "undefined") {
+        box.textContent = "Could not load the QR generator. Check your connection.";
+        return;
+      }
+      new QRCode(box, { text: APP_DOWNLOAD_URL, width: 200, height: 200 });
+    }
+
+    // Ticket tabs + answered-ticket notifications
+    function setTicketTab(t) {
+      state.ticketTab = t;
+      ["all", "open", "answered"].forEach(n => { const b = $("#tab-" + n); if (b) b.classList.toggle("on", n === t); });
+      loadMyTickets();
+    }
+
+    async function pollTickets() {
+      if (!state.token || !state.user || state.user.role !== 'student') return;
+      try {
+        const r = await fetch('/api/v1/tickets/my', { headers: { 'Authorization': `Bearer ${state.token}` } });
+        if (!r.ok) return;
+        const tickets = await r.json();
+        const key = 'ci_seen_' + state.user.username;
+        const seen = JSON.parse(localStorage.getItem(key) || '[]');
+        const fresh = tickets.filter(x => x.status !== 'pending' && !seen.includes(x.id)).map(x => x.id);
+        const prev = (state.unseen || []).length;
+        state.unseen = fresh;
+        renderRail();
+        $$("#rail button").forEach(b => { if (b.dataset.go === state.view) b.setAttribute("aria-current", "page"); });
+        if (fresh.length > prev) toast(`Faculty answered ${fresh.length} of your inquiries. Open My Tickets to read the reply.`);
+      } catch (e) { }
+    }
+
+    // Student: My Tickets View
+    async function loadMyTickets() {
+      const listEl = $("#my-tickets-list");
+      if (!listEl) return;
+      listEl.innerHTML = '<div class="none">Loading your inquiries...</div>';
+
+      if (!state.token) {
+        listEl.innerHTML = '<div class="none">Please sign in to view your tickets.</div>';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/v1/tickets/my', {
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        const tickets = await res.json();
+
+        if (!tickets || tickets.length === 0) {
+          listEl.innerHTML = '<div class="none">You have not submitted any inquiries yet.</div>';
+          return;
+        }
+
+        // Mark answered tickets as seen (clears the notification badge)
+        try {
+          const key = 'ci_seen_' + (state.user ? state.user.username : '');
+          localStorage.setItem(key, JSON.stringify(tickets.filter(x => x.status !== 'pending').map(x => x.id)));
+          state.unseen = [];
+          renderRail();
+          $$("#rail button").forEach(b => { if (b.dataset.go === state.view) b.setAttribute("aria-current", "page"); });
+        } catch (e) { }
+
+        const tab = state.ticketTab || 'all';
+        const shown = tickets.filter(t => tab === 'open' ? t.status === 'pending' : tab === 'answered' ? t.status !== 'pending' : true);
+        if (shown.length === 0) {
+          listEl.innerHTML = `<div class="none">No ${tab === 'open' ? 'open' : 'answered'} inquiries.</div>`;
+          return;
+        }
+
+        listEl.innerHTML = shown.map(t => {
+          const isResolved = (t.status === 'resolved');
+          const dateStr = t.created_at ? new Date(t.created_at).toLocaleString() : '';
+          return `
+    <div class="ticket-card">
+      <div class="ticket-header">
+        <span>Inquiry #${t.id}</span>
+        <span class="badge-status status-${t.status}">${t.status}</span>
+      </div>
+      <div class="ticket-q">${esc(t.query_text)}</div>
+      <div style="font-size:12px;color:var(--mu)">Submitted on ${dateStr}</div>
+      ${t.faculty_reply ? `
+        <div class="ticket-reply">
+          <div class="ticket-reply-title">
+            <span>Faculty Written Response</span>
+            <span>${t.resolved_at ? new Date(t.resolved_at).toLocaleString() : ''}</span>
+          </div>
+          <div class="ticket-reply-text">${esc(t.faculty_reply)}</div>
+        </div>
+      ` : `
+        <div style="font-size:13px;color:var(--mu);font-style:italic">
+          Pending review by departmental faculty desk.
+        </div>
+      `}
+    </div>
+  `;
+        }).join('');
+      } catch (err) {
+        listEl.innerHTML = `<div class="none">Error loading inquiries: ${esc(err.message)}</div>`;
+      }
+    }
+
+    // Faculty Desk
+    function loadFacultyDesk() {
+      if (!state.token || (state.user && state.user.role === 'student')) {
+        go('home');
+        return;
+      }
+      loadFacultyCirculars();
+      loadFacultyKeyDates();
+      loadFacultyTickets();
+    }
+
+    async function loadFacultyCirculars() {
+      const el = $("#faculty-circulars-list");
+      if (!el) return;
+      el.innerHTML = '<div class="empty-notice">Loading published circulars...</div>';
+
+      try {
+        const res = await fetch('/api/v1/circulars', { headers: { 'Authorization': `Bearer ${state.token}` } });
+        const rawDocs = await res.json(); const docs = Array.isArray(rawDocs) ? rawDocs : (rawDocs.circulars || rawDocs.items || []);
+        state.circulars = docs;
+
+        if (!docs || docs.length === 0) {
+          el.innerHTML = '<div class="empty-notice">No official circulars published yet.</div>';
+          return;
+        }
+
+        el.innerHTML = docs.map(doc => {
+          const fileUrl = doc.file_url || `/api/v1/circulars/${doc.id}/file`;
+          const dateStr = doc.created_at ? new Date(doc.created_at).toLocaleDateString() : '';
+          return `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--ln);gap:12px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span class="cat-tag" style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--ac-light);color:var(--ac);border:1px solid var(--ac-subtle);font-weight:600">${esc(doc.category)}</span>
+              <strong style="font-size:14px;color:var(--tx);word-break:break-word">${esc(doc.title || doc.filename)}</strong>
+            </div>
+            <div style="font-size:12px;color:var(--mu);margin-top:2px">${doc.total_pages || 1} pages • Published on ${dateStr}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <a href="${fileUrl}" target="_blank" rel="noopener" class="btn-read-sm" style="padding:5px 12px;font-size:12px">View File</a>
+            <button class="btn-auth" style="border-color:var(--danger);color:var(--danger);padding:5px 12px;font-size:12px" onclick="deleteCircularAction(${doc.id}, '${esc(doc.filename)}')">Remove</button>
+          </div>
+        </div>
+      `;
+        }).join('');
+      } catch (err) {
+        el.innerHTML = `<div class="empty-notice">Error loading circulars: ${esc(err.message)}</div>`;
+      }
+    }
+
+    async function deleteCircularAction(docId, filename) {
+      if (!confirm(`Are you sure you want to remove "${filename}"? It will be deleted from the library and search engine.`)) {
+        return;
+      }
+      try {
+        const res = await fetch(`/api/v1/circulars/${docId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        if (!res.ok) {
+          const d = await res.json();
+          throw new Error(d.detail || "Failed to remove circular.");
+        }
+        loadCirculars();
+        loadFacultyCirculars();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    async function loadFacultyKeyDates() {
+      const el = $("#faculty-dates-list");
+      if (!el) return;
+      try {
+        const res = await fetch('/api/v1/circulars/dates/list', { headers: { 'Authorization': `Bearer ${state.token}` } });
+        const rawDates = await res.json(); const dates = Array.isArray(rawDates) ? rawDates : (rawDates.dates || rawDates.items || []);
+        state.keyDates = dates;
+
+        if (!dates || dates.length === 0) {
+          el.innerHTML = '<div class="empty-notice">No active key dates announced yet.</div>';
+          return;
+        }
+
+        el.innerHTML = dates.map(d => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--ln);font-size:13px">
+        <div>
+          <strong style="color:var(--tx)">${esc(d.title)}</strong>
+          <span style="color:var(--mu);margin-left:8px;font-size:12px">${esc(d.date_str)}</span>
+        </div>
+        <button class="btn-auth" style="border-color:var(--danger);color:var(--danger);padding:3px 10px;font-size:11px" onclick="deleteKeyDateAction(${d.id})">Remove</button>
+      </div>
+    `).join('');
+      } catch (err) {
+        el.innerHTML = `<div class="empty-notice">Error loading key dates: ${esc(err.message)}</div>`;
+      }
+    }
+
+    async function deleteKeyDateAction(dateId) {
+      if (!confirm("Are you sure you want to remove this academic key date?")) return;
+      try {
+        const res = await fetch(`/api/v1/circulars/dates/${dateId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        if (!res.ok) {
+          const d = await res.json();
+          throw new Error(d.detail || "Failed to delete key date.");
+        }
+        loadKeyDates();
+        loadFacultyKeyDates();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    async function loadFacultyTickets() {
+      const listEl = $("#faculty-tickets-list");
+      listEl.innerHTML = '<div class="none">Loading student inquiries...</div>';
+
+      try {
+        const res = await fetch('/api/v1/tickets?status=pending', {
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        const tickets = await res.json();
+
+        if (!tickets || tickets.length === 0) {
+          listEl.innerHTML = '<div class="none">All student inquiries are resolved. No pending inquiries.</div>';
+          return;
+        }
+
+        listEl.innerHTML = tickets.map(t => `
+  <div class="ticket-card" style="background:var(--s2)">
+    <div class="ticket-header">
+      <span>Inquiry #${t.id} — Student: <strong>${esc(t.student_username || 'ID ' + t.student_id)}</strong></span>
+      <span class="badge-status status-${t.status}">${t.status}</span>
+    </div>
+    <div class="ticket-q">${esc(t.query_text)}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+      <textarea id="reply-text-${t.id}" class="select-light" placeholder="Type official faculty reply..." style="min-height:70px;resize:vertical"></textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn-auth primary" onclick="resolveTicketAction(${t.id}, 'resolved')">Send Reply & Resolve</button>
+        <button class="btn-auth" style="border-color:var(--danger);color:var(--danger)" onclick="resolveTicketAction(${t.id}, 'rejected')">Reject</button>
+      </div>
+    </div>
+  </div>
+`).join('');
+      } catch (err) {
+        listEl.innerHTML = `<div class="none">Error loading inquiries: ${esc(err.message)}</div>`;
+      }
+    }
+
+    async function resolveTicketAction(ticketId, targetStatus) {
+      const replyField = $(`#reply-text-${ticketId}`);
+      const notes = replyField ? replyField.value.trim() : '';
+
+      if (!notes) {
+        toast("Please enter reply remarks before submitting.", true);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/tickets/${ticketId}/resolve`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.token}`
+          },
+          body: JSON.stringify({ resolution_notes: notes, status: targetStatus })
+        });
+
+        if (!res.ok) {
+          const d = await res.json();
+          throw new Error(d.detail || "Failed to resolve ticket.");
+        }
+
+        loadFacultyTickets();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    // Faculty: Publish Key Date Action
+    const btnAddKeydate = $("#btn-add-keydate");
+    if (btnAddKeydate) {
+      btnAddKeydate.onclick = async () => {
+        const titleEl = $("#keydate-title");
+        const dateEl = $("#keydate-date");
+        const title = (titleEl ? titleEl.value : "").trim();
+        const dateStr = (dateEl ? dateEl.value : "").trim();
+
+        if (!title || !dateStr) {
+          showFeedback("keydate-alert", "Title and Date are required.", true);
+          return;
+        }
+
+        try {
+          const res = await fetch('/api/v1/circulars/dates/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.token}`
+            },
+            body: JSON.stringify({ title, date_str: dateStr })
+          });
+
+          const d = await res.json();
+          if (!res.ok) throw new Error(d.detail || "Could not save date.");
+
+          if (titleEl) titleEl.value = "";
+          if (dateEl) dateEl.value = "";
+          showFeedback("keydate-alert", "Academic Key Date published successfully.", false);
+          loadKeyDates();
+          loadFacultyKeyDates();
+        } catch (err) {
+          showFeedback("keydate-alert", err.message, true);
+        }
+      };
+    }
+
+    // Faculty Dropzone Handling
+    const dropzone = $("#faculty-dropzone");
+    if (dropzone) {
+      ['dragenter', 'dragover'].forEach(n => dropzone.addEventListener(n, e => { e.preventDefault(); dropzone.style.background = '#DBEAFE'; }));
+      ['dragleave', 'drop'].forEach(n => dropzone.addEventListener(n, e => { e.preventDefault(); dropzone.style.background = 'var(--ac-light)'; }));
+      dropzone.addEventListener('drop', e => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && /\.(pdf|docx|pptx|xlsx|xls|csv|png|jpg|jpeg|webp)$/i.test(files[0].name)) {
+          state.selectedFile = files[0];
+          const fl = $("#file-label");
+          if (fl) fl.textContent = files[0].name;
+        }
+      });
+    }
+    const fileInput = $("#file-input");
+    if (fileInput) {
+      fileInput.onchange = e => {
+        if (e.target.files.length > 0) {
+          state.selectedFile = e.target.files[0];
+          const fl = $("#file-label");
+          if (fl) fl.textContent = e.target.files[0].name;
+        }
+      };
+    }
+
+    // Faculty Upload Execution
+    const btnUpload = $("#btn-upload-file");
+    if (btnUpload) {
+      btnUpload.onclick = async () => {
+        if (!state.selectedFile) {
+          showFeedback("upload-alert", "Please select a PDF file first.", true);
+          return;
+        }
+
+        btnUpload.textContent = "Uploading...";
+        btnUpload.disabled = true;
+        showFeedback("upload-alert", "Uploading...", false);
+
+        try {
+          const categoryEl = $("#upload-category");
+          const categoryVal = categoryEl ? categoryEl.value : "General";
+          const fd = new FormData();
+          fd.append("file", state.selectedFile);
+          fd.append("category", categoryVal);
+          const titleEl = $("#upload-title");
+          const titleVal = titleEl ? titleEl.value.trim() : "";
+          if (titleVal) fd.append("title", titleVal);
+
+          const res = await fetch('/api/v1/circulars/upload', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${state.token}` },
+            body: fd
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || "Upload failed.");
+
+          btnUpload.textContent = "Uploaded";
+          showFeedback("upload-alert", "Uploaded successfully.", false);
+
+          state.selectedFile = null;
+          const tiEl = $("#upload-title"); if (tiEl) tiEl.value = "";
+          const fi = $("#file-input");
+          if (fi) fi.value = "";
+          const fl = $("#file-label");
+          if (fl) fl.textContent = "Click or drop official circular (PDF, DOCX, PPTX, XLSX, CSV, or Image)";
+
+          loadCirculars();
+          loadFacultyCirculars();
+
+          setTimeout(() => {
+            btnUpload.textContent = "Upload Circular";
+            btnUpload.disabled = false;
+          }, 2000);
+        } catch (err) {
+          showFeedback("upload-alert", err.message, true);
+          btnUpload.textContent = "Upload Circular";
+          btnUpload.disabled = false;
+        }
+      };
+    }
+
+    // Authentication Modals
+    function openModal(id) {
+      closeModals();
+      const el = $(`#${id}`);
+      if (el) el.classList.add("on");
+    }
+
+    function closeModals() {
+      $$(".modal").forEach(m => m.classList.remove("on"));
+      $$(".alert").forEach(a => a.classList.remove("on"));
+    }
+
+    function showFeedback(elId, msg, isErr) {
+      const el = $(`#${elId}`);
+      if (!el) return;
+      el.textContent = msg;
+      el.className = `alert on ${isErr ? 'alert-err' : 'alert-ok'}`;
+    }
+
+    // Sign In Action
+    const btnSignIn = $("#btn-do-signin");
+    if (btnSignIn) {
+      btnSignIn.onclick = async () => {
+        const uInp = $("#signin-username");
+        const pInp = $("#signin-password");
+        const u = (uInp ? uInp.value : "").trim();
+        const p = pInp ? pInp.value : "";
+        if (!u || !p) {
+          showFeedback("signin-alert", "Roll/Employee ID and password are required.", true);
+          return;
+        }
+
+        btnSignIn.textContent = "Signing In...";
+        btnSignIn.disabled = true;
+
+        try {
+          const res = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+          });
+          const d = await res.json();
+          if (!res.ok) throw new Error(d.detail || "Invalid ID or password.");
+
+          state.token = d.access_token;
+          state.user = d.user;
+          localStorage.setItem('ci_token', state.token);
+          localStorage.setItem('ci_user', JSON.stringify(state.user));
+
+          updateAuthUI();
+          closeModals();
+          if (uInp) uInp.value = "";
+          if (pInp) pInp.value = "";
+          renderSidebarWidgets();
+          loadCirculars();
+          loadKeyDates();
+          loadPopularQueries();
+          loadChatHistory();
+
+          go('home');
+        } catch (err) {
+          showFeedback("signin-alert", err.message, true);
+        } finally {
+          btnSignIn.textContent = "Sign In";
+          btnSignIn.disabled = false;
+        }
+      };
+    }
+
+    // Open Registration Action
+    const regRoleEl = $("#reg-role");
+    if (regRoleEl) {
+      regRoleEl.addEventListener("change", () => {
+        const codeGroup = $("#reg-faculty-code-group");
+        if (codeGroup) {
+          codeGroup.style.display = (regRoleEl.value === "faculty") ? "block" : "none";
+        }
+      });
+    }
+
+    const btnRegister = $("#btn-do-register");
+    if (btnRegister) {
+      btnRegister.onclick = async () => {
+        const nameEl = $("#reg-name");
+        const usernameEl = $("#reg-username");
+        const roleEl = $("#reg-role");
+        const deptEl = $("#reg-department");
+        const facultyCodeEl = $("#reg-faculty-code");
+        const passEl = $("#reg-password");
+
+        const name = (nameEl ? nameEl.value : "").trim();
+        const username = (usernameEl ? usernameEl.value : "").trim();
+        const role = roleEl ? roleEl.value : "student";
+        const dept = (deptEl ? deptEl.value : "").trim();
+        const facultyCode = (facultyCodeEl ? facultyCodeEl.value : "").trim();
+        const password = passEl ? passEl.value : "";
+
+        if (!username || !password) {
+          showFeedback("reg-alert", "Roll/Employee ID and Password are required.", true);
+          return;
+        }
+
+        if (role === "faculty" && !facultyCode) {
+          showFeedback("reg-alert", "Faculty Authorization Code is required for teacher registration.", true);
+          return;
+        }
+
+        btnRegister.textContent = "Creating Account...";
+        btnRegister.disabled = true;
+
+        try {
+          const res = await fetch('/api/v1/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username,
+              user_id: username,
+              roll_number: username,
+              password,
+              role,
+              full_name: name,
+              name,
+              department: dept,
+              faculty_code: facultyCode
+            })
+          });
+          const d = await res.json();
+          if (!res.ok) throw new Error(d.detail || "Registration failed.");
+
+          state.token = d.access_token;
+          state.user = d.user;
+          localStorage.setItem('ci_token', state.token);
+          localStorage.setItem('ci_user', JSON.stringify(state.user));
+
+          updateAuthUI();
+          closeModals();
+          renderSidebarWidgets();
+          loadCirculars();
+          loadKeyDates();
+          loadPopularQueries();
+          loadChatHistory();
+
+          go('home');
+        } catch (err) {
+          showFeedback("reg-alert", err.message, true);
+        } finally {
+          btnRegister.textContent = "Create Account";
+          btnRegister.disabled = false;
+        }
+      };
+    }
+
+    // Escalation Modal & Submission
+    function openEscalateModal(q) {
+      if (!state.token) {
+        openModal('modal-signin');
+        return;
+      }
+      state.escalateQuery = q;
+      const preview = $("#escalate-query-preview");
+      if (preview) {
+        if ('value' in preview) preview.value = q;
+        else preview.textContent = q;
+      }
+      openModal('modal-escalate');
+    }
+
+    const btnEscalate = $("#btn-do-escalate");
+    if (btnEscalate) {
+      btnEscalate.onclick = async () => {
+        const preview = $("#escalate-query-preview");
+        const queryToSubmit = (preview && 'value' in preview && preview.value.trim()) ? preview.value.trim() : (state.escalateQuery || "");
+
+        if (!queryToSubmit) {
+          showFeedback("escalate-alert", "Please enter your college inquiry.", true);
+          return;
+        }
+
+        const wordCount = queryToSubmit.split(/\s+/).filter(Boolean).length;
+        if (wordCount > 200) {
+          showFeedback("escalate-alert", `Your inquiry is ${wordCount} words. Please keep it within 200 words.`, true);
+          return;
+        }
+
+        btnEscalate.textContent = "Submitting...";
+        btnEscalate.disabled = true;
+
+        try {
+          const res = await fetch('/api/v1/tickets/escalate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.token}`
+            },
+            body: JSON.stringify({ query_text: queryToSubmit })
+          });
+          const d = await res.json();
+          if (!res.ok) throw new Error(d.detail || "Escalation request failed.");
+
+          closeModals();
+          toast(`Inquiry #${d.ticket_id} submitted to the Faculty Desk.`);
+          go('tickets');
+        } catch (err) {
+          showFeedback("escalate-alert", err.message, true);
+        } finally {
+          btnEscalate.textContent = "Confirm Escalation";
+          btnEscalate.disabled = false;
+        }
+      };
+    }
+
+    // Dynamic Data Fetchers: Key Dates & Popular Queries
+    async function loadKeyDates() {
+      if (!state.token) return;
+      try {
+        const res = await fetch('/api/v1/circulars/dates/list', {
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        if (res.ok) {
+          const rawKd = await res.json(); state.keyDates = Array.isArray(rawKd) ? rawKd : (rawKd.dates || rawKd.items || []);
+          renderSidebarWidgets();
+        }
+      } catch (e) { }
+    }
+
+    async function loadPopularQueries() {
+      if (!state.token) return;
+      try {
+        const res = await fetch('/api/v1/query/popular', {
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        if (res.ok) {
+          state.popularQueries = await res.json();
+          renderSidebarWidgets();
+        }
+      } catch (e) { }
+    }
+
+    async function renderHistoryView() {
+      const el = $("#history-list");
+      if (!el) return;
+      el.innerHTML = '<div class="none">Loading saved chat history...</div>';
+      try {
+        const res = await fetch('/api/v1/query/history', { headers: { 'Authorization': `Bearer ${state.token}` } });
+        if (!res.ok) throw new Error("Could not fetch history.");
+        const items = await res.json();
+        if (!items || items.length === 0) {
+          el.innerHTML = '<div class="none">No conversations saved in the last 30 days yet.</div>';
+          return;
+        }
+        el.innerHTML = items.slice().reverse().map(item => `
+      <div class="ticket-card" style="cursor:pointer" onclick="go('chat')">
+        <div class="ticket-header">
+          <span>Saved Inquiry</span>
+          <span class="badge-status ${item.status === 'answered' ? 'status-resolved' : 'status-pending'}">${esc(item.status || 'saved')}</span>
+        </div>
+        <div class="ticket-q">${esc(item.query_text)}</div>
+        ${item.answer_text ? `<div style="font-size:13px;color:var(--tx-sec);line-height:1.5">${esc(item.answer_text.replace(/\[(?:Notice|Document|Page):[^\]]+\]/gi, '').replace(/\*\*/g, '').trim().slice(0, 220))}${item.answer_text.length > 220 ? '...' : ''}</div>` : ''}
+      </div>
+    `).join('');
+      } catch (err) {
+        el.innerHTML = `<div class="none">Error loading history: ${esc(err.message)}</div>`;
+      }
+    }
+
+    // 30-Day Chat Conversation History Loader
+    async function loadChatHistory() {
+      if (!state.token) return;
+      pollTickets();
+      try {
+        const res = await fetch('/api/v1/query/history', {
+          headers: { 'Authorization': `Bearer ${state.token}` }
+        });
+        if (!res.ok) return;
+        const items = await res.json();
+        const clearBtn = $("#btn-clear-chat");
+        if (!items || items.length === 0) {
+          if (clearBtn) clearBtn.style.display = "none";
+          return;
+        }
+        const ms = getMs();
+        if (!ms) return;
+        ms.innerHTML = "";
+        const em = $("#em");
+        if (em) em.remove();
+        const chatContainer = $("#chat-container") || $(".chat");
+        if (chatContainer) chatContainer.classList.remove("is-empty");
+        if (clearBtn) clearBtn.style.display = "inline-flex";
+
+        for (const item of items) {
+          addMsg("u", `<div class="b">${esc(item.query_text)}</div>`);
+          if (item.status === 'answered' && item.answer_text) {
+            let citationsHtml = '';
+            const topCit = (item.citations && item.citations.length > 0) ? item.citations[0] : null;
+            if (topCit) {
+              citationsHtml = `
+        <div class="src">
+          ${ic("check")}
+          <b class="cite-link" role="button" tabindex="0" onclick="openCitation('${esc(topCit.filename).replace(/'/g, "\\'")}', ${Number(topCit.page_number) || 1})">[Notice: ${esc(topCit.filename)}, Page: ${topCit.page_number}]</b>
+          <button data-copy aria-label="Copy answer">${ic("copy")}<span>Copy</span></button>
+        </div>
+      `;
+            }
+            addMsg("a", `
+      <div class="b">
+        <h4>Official Information</h4>
+        <p>${formatAnswerText(item.answer_text)}</p>
+        ${citationsHtml}
+      </div>
+    `);
+          } else {
+            const queryEscaped = esc(item.query_text);
+            addMsg("a", `
+      <div class="b">
+        <h4>Notice</h4>
+        <p>${esc(item.answer_text || "I couldn't find verified details about this in the available campus circulars.")}</p>
+        <div style="margin-top:10px">
+          <button class="btn-escalate-inline" onclick="openEscalateModal('${queryEscaped.replace(/'/g, "\\'")}')">
+            Escalate to Faculty Desk →
+          </button>
+        </div>
+      </div>
+    `);
+          }
+        }
+        ms.scrollTop = ms.scrollHeight;
+      } catch (err) {
+        console.warn("Could not load chat history:", err);
+      }
+    }
+
+    // Sidebar Widgets Renderer
+    function renderSidebarWidgets() {
+      const side = $("#side");
+      if (!side) return;
+
+      if (!state.token) {
+        side.innerHTML = `
+  <div class="pn" style="text-align:center;padding:36px 18px;border-radius:16px;">
+    <div style="width:48px;height:48px;border-radius:50%;background:#F1F5F9;display:grid;place-items:center;margin:0 auto 14px;color:var(--tx-sec)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    </div>
+    <h5 style="margin:0 0 8px;font-size:15px;color:var(--tx);font-weight:600;display:block;">Access Restricted</h5>
+    <p style="font-size:13px;color:var(--mu);line-height:1.5;margin:0 0 18px;">
+      Sign in to view official circulars, upcoming key dates, and campus inquiries.
+    </p>
+    <button class="btn-auth primary" style="width:100%;justify-content:center;" onclick="openModal('modal-signin')">
+      Sign In to Access
+    </button>
+  </div>
+`;
+        return;
+      }
+
+      const recentPdfs = (state.circulars || []).slice(0, 3).map(d => {
+        const fileUrl = (d.file_url || `/api/v1/circulars/${d.id}/file`) + (state.token ? `?token=${encodeURIComponent(state.token)}` : '');
+        return `
+  <div class="row-item">
+    <span class="pn-link">${esc((d.title || d.filename).slice(0, 28))}</span>
+    <a href="${fileUrl}" target="_blank" rel="noopener" class="btn-read-sm">View File</a>
+  </div>
+`;
+      }).join('');
+
+      const keyDatesHtml = (state.keyDates && state.keyDates.length) ? state.keyDates.map(k => `
+  <div class="row-item">
+    <span>${esc(k.title)}</span>
+    <span style="font-weight:600;color:var(--tx)">${esc(k.date_str)}</span>
+  </div>
+`).join('') : '<div class="empty-notice">No upcoming dates announced yet.</div>';
+
+      const popularHtml = (state.popularQueries && state.popularQueries.length) ? state.popularQueries.map(q => `
+  <button class="inquiry-btn" data-q="${esc(q)}">
+    ${esc(q)}
+  </button>
+`).join('') : '<div class="empty-notice">No common inquiries yet. Ask a question to see popular campus inquiries here.</div>';
+
+      side.innerHTML = `
+<div class="pn">
+  <h5>Official Circulars<em>Recent</em></h5>
+  ${recentPdfs.length ? recentPdfs : '<div class="empty-notice">No circulars published yet.</div>'}
+  <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--ln)">
+    <button class="btn-auth" style="width:100%;text-align:center" data-go="circulars">View All Circulars →</button>
+  </div>
+</div>
+<div class="pn">
+  <h5>Campus Key Dates<em>Academic Calendar</em></h5>
+  ${keyDatesHtml}
+</div>
+<div class="pn">
+  <h5>Common Inquiries<em>Frequently Asked</em></h5>
+  ${popularHtml}
+</div>
+<p class="note">Answers are sourced directly from official circulars published by college administration.</p>
+`;
+    }
+
+    // Global Click Event Delegation
+    document.addEventListener("click", ev => {
+      const t = ev.target.closest("[data-go],[data-q],[data-copy],[data-new]");
+      if (!t) return;
+
+      if (t.dataset.go) {
+        if (!state.token && t.dataset.go !== "home") {
+          showAuthGateNotice("Please sign in to ask questions and access campus circulars.");
+          return;
+        }
+        go(t.dataset.go);
+      } else if (t.dataset.q) {
+        if (!state.token) {
+          showAuthGateNotice("Please sign in to ask questions and access campus circulars.");
+          return;
+        }
+        ask(t.dataset.q);
+      } else if (t.hasAttribute("data-new")) {
+        resetChat();
+      } else if (t.hasAttribute("data-copy")) {
+        const bubble = t.closest(".b");
+        if (bubble) {
+          const text = [...bubble.querySelectorAll("p,li")].map(n => n.textContent).join("\n");
+          navigator.clipboard.writeText(text).then(() => {
+            const span = t.querySelector("span");
+            if (span) {
+              span.textContent = "Copied";
+              setTimeout(() => { span.textContent = "Copy"; }, 2000);
+            }
+          });
+        }
+      }
+    });
+
+    // Prompt Input Bindings
+    const bindEnter = (inpId, btnId) => {
+      const input = $(inpId);
+      const btn = $(btnId);
+      if (input) {
+        input.addEventListener("keydown", e => {
+          if (e.key === "Enter") {
+            if (inpId === "#hq" && !state.token) {
+              showAuthGateNotice("Please sign in to ask questions and access campus circulars.");
+              return;
+            }
+            const val = input.value.trim();
+            input.value = "";
+            ask(val);
+          }
+        });
+      }
+      if (btn && input) {
+        btn.onclick = () => {
+          if (inpId === "#hq" && !state.token) {
+            showAuthGateNotice("Please sign in to ask questions and access campus circulars.");
+            return;
+          }
+          const val = input.value.trim();
+          input.value = "";
+          ask(val);
+        };
+      }
+    };
+
+    // Home search input guest guard
+    const hqEl = $("#hq");
+    if (hqEl) {
+      const guardGuest = e => {
+        if (!state.token) {
+          e.preventDefault();
+          hqEl.blur();
+          showAuthGateNotice("Please sign in to ask questions and access campus circulars.");
+        }
+      };
+      hqEl.addEventListener("focus", guardGuest);
+      hqEl.addEventListener("click", guardGuest);
+    }
+
+    bindEnter("#hq", "#hs");
+    bindEnter("#cq", "#cs");
+
+    // Modal input Enter key bindings
+    ["#signin-username", "#signin-password"].forEach(sel => {
+      const el = $(sel);
+      if (el) {
+        el.addEventListener("keydown", e => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const b = $("#btn-do-signin");
+            if (b) b.click();
+          }
+        });
+      }
+    });
+
+    ["#reg-name", "#reg-username", "#reg-department", "#reg-faculty-code", "#reg-password"].forEach(sel => {
+      const el = $(sel);
+      if (el) {
+        el.addEventListener("keydown", e => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const b = $("#btn-do-register");
+            if (b) b.click();
+          }
+        });
+      }
+    });
+
+    // Initialize Layout & Category Cards
+    function initApp() {
+      const hs = $("#hs"); if (hs) hs.innerHTML = ic("send");
+      const cs = $("#cs"); if (cs) cs.innerHTML = ic("send");
+      const nb = $("#nb");
+      if (nb) {
+        nb.innerHTML = ic("plus") + "New Question";
+        nb.onclick = () => resetChat();
+      }
+      const btnClearChat = $("#btn-clear-chat");
+      if (btnClearChat) {
+        btnClearChat.innerHTML = ic("trash") + "Clear History";
+        btnClearChat.onclick = async () => {
+          if (!state.token) return;
+          if (!confirm("Are you sure you want to clear your chat history?")) return;
+          try {
+            await fetch('/api/v1/query/history', {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${state.token}` }
+            });
+            resetChat();
+            btnClearChat.style.display = "none";
+          } catch (err) {
+            toast("Failed to clear chat history: " + err.message, true);
+          }
+        };
+      }
+
+      const cats = $("#cats");
+      if (cats) {
+        cats.innerHTML = Object.entries(CATS).map(([id, c], idx) => `
+  <button class="cat" style="--a:${c.a}" data-go="${id}">
+    <div class="cat-idx">0${idx + 1}</div>
+    <h2>${c.t}</h2>
+    <p>${c.d}</p>
+    <span class="gl">${c.g}</span>
+  </button>
+`).join("");
+      }
+
+      renderCircChips();
+      resetChat();
+      validateSessionOnStartup();
+      setInterval(pollTickets, 60000);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initApp);
+    } else {
+      initApp();
+    }
+
+    // Close modals with Escape
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePreview(); closeModals(); } });
+
+  </script>
+</body>
+
+</html>
