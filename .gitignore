@@ -31,4 +31,5 @@ node_modules/
 !analyser-backend/chroma_db/**
 !analyser-backend/data/
 !analyser-backend/data/**
+analyser-backend\analyzer.pem
 
