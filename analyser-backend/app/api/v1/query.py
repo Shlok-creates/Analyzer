@@ -86,20 +86,11 @@ def submit_query(
         vector_service = VectorStoreService()
         rag_engine = RAGEngine()
 
-        # Step 1: Empty DB Guard and Active Document Verification
-        is_student = (getattr(current_user, "role", "student") == "student")
-        all_active_docs = db.query(Document).filter(
+        # Step 1: Empty DB Guard and Active Document Verification (all active circulars)
+        active_docs = db.query(Document).filter(
             Document.status == "active",
             or_(Document.is_active == True, Document.is_active.is_(None)),
         ).all()
-
-        # Treat visibility case-insensitively: any document that is not explicitly 'faculty' is public
-        active_docs = []
-        for d in all_active_docs:
-            d_vis = (getattr(d, "visibility", None) or "public").strip().lower()
-            if is_student and d_vis == "faculty":
-                continue
-            active_docs.append(d)
 
         active_doc_id_strs = {str(d.id).strip() for d in active_docs}
         active_doc_id_ints = {int(d.id) for d in active_docs}
@@ -166,7 +157,7 @@ def submit_query(
         # Automatically include chunks from matching documents (e.g. Seating, Exam, Timetable)
         if is_schedule_query:
             try:
-                raw_matching_docs = db.query(Document).filter(
+                matching_docs = db.query(Document).filter(
                     Document.status == "active",
                     or_(Document.is_active == True, Document.is_active.is_(None)),
                     or_(
@@ -177,10 +168,6 @@ def submit_query(
                         Document.category.ilike("%exam%"),
                     ),
                 ).all()
-                matching_docs = [
-                    m for m in raw_matching_docs
-                    if not (is_student and (getattr(m, "visibility", None) or "public").strip().lower() == "faculty")
-                ]
 
                 existing_chunk_ids = {c.get("id") or c.get("text") for c in retrieved_chunks}
                 extra_chunks = []
@@ -204,7 +191,6 @@ def submit_query(
                                     "page_number": meta.get("page_number", 1),
                                     "category": meta.get("category", m_doc.category),
                                     "doc_id": m_doc.id,
-                                    "visibility": meta.get("visibility", getattr(m_doc, "visibility", "public")),
                                     "distance": 0.40,
                                     "metadata": meta,
                                 })
@@ -217,7 +203,7 @@ def submit_query(
             except Exception as hybrid_err:
                 logger.warning("Error in hybrid retrieval: %s", hybrid_err)
 
-        # Step 4: Strict Security & Deletion Filter (Zero tolerance for soft-deleted/confidential documents)
+        # Step 4: Strict Security & Deletion Filter (Zero tolerance for soft-deleted documents)
         def is_chunk_active_and_permitted(c: dict) -> bool:
             c_meta = c.get("metadata") or {}
             c_doc_id = c.get("doc_id")
@@ -227,10 +213,6 @@ def submit_query(
                 c_doc_id = c_meta.get("circular_id")
 
             c_filename = str(c.get("filename") or c_meta.get("filename") or "").strip()
-            c_vis = str(c.get("visibility") or c_meta.get("visibility") or "public").strip().lower()
-
-            if is_student and c_vis == "faculty":
-                return False
 
             if c_doc_id is not None:
                 str_id = str(c_doc_id).strip()
@@ -271,9 +253,6 @@ def submit_query(
             rag_result = rag_engine.generate_grounded_answer(
                 query=clean_query,
                 retrieved_chunks=retrieved_chunks,
-                user_role=getattr(current_user, "role", "student"),
-                user_username=getattr(current_user, "username", None),
-                user_full_name=getattr(current_user, "full_name", None),
             )
             is_found = rag_result.get("found", False)
 
